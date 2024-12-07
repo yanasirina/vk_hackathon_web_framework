@@ -7,7 +7,7 @@ class Server(BaseApplication):
         self.options = options or {}
         super().__init__()
 
-    def init(self, parser, opts, args):
+    def init(self, *_):
         return self.options
 
     def load(self):
