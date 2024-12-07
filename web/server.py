@@ -7,9 +7,12 @@ class Server(BaseApplication):
         self.options = options or {}
         super().__init__()
 
-    def load_config(self):
-        for key, value in self.options.items():
-            self.cfg.set(key.lower(), value)
+    def init(self, parser, opts, args):
+        return self.options
 
     def load(self):
         return self.app
+
+    def load_config(self):
+        for key, value in self.options.items():
+            self.cfg.set(key.lower(), value)

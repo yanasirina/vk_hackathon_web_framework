@@ -8,6 +8,7 @@ def main() -> None:
         packages=find_packages(include=['web', 'web.*']),
         install_requires=[
             'gunicorn',
+            'webob',
         ],
     )
 

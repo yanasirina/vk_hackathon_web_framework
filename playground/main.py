@@ -1,35 +1,33 @@
-import web
-
 import os
 
-
-router = web.Router()
-
-
-@router.route('/')
-def home(environ):
-    return 'Welcome to the home page!'
+import web
 
 
-@router.route('/hello')
-def hello(environ):
-    name = environ.get('QUERY_STRING', 'world').split('=')[-1]
-    return f'Hello, {name}!'
+app = web.Router()
 
 
-@router.route('/about')
-def about(environ):
-    return 'This i a simple Router with Gunicorn example.'
+@app.route('/hello')
+def json_example(request, response):
+    _ = request.method
+    response.content_type = 'application/json'
+    response.json = {'message': 'hello, world!'}
+
+
+@app.not_found
+def custom_404(request, response):
+    _ = request.method
+    response.content_type = 'application/json'
+    response.json = {'error': 'route not found'}
 
 
 def main() -> None:
-    options = {
+    config = {
         'bind': '0.0.0.0:8080',
         'workers': os.cpu_count(),
         'loglevel': 'info',
     }
 
-    web.Server(router, options).run()
+    web.Server(app, config).run()
 
 
 if __name__ == '__main__':

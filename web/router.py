@@ -1,6 +1,13 @@
+from http import HTTPStatus
+
+from webob import Request, Response
+from webob.exc import HTTPNotFound
+
+
 class Router:
     def __init__(self):
         self.routes = {}
+        self.not_found_handler = None
 
     def route(self, path):
         def decorator(func):
@@ -9,16 +16,25 @@ class Router:
 
         return decorator
 
+    def not_found(self, func):
+        self.not_found_handler = func
+        return func
+
     def __call__(self, environ, start_response):
-        path = environ.get("PATH_INFO", "/")
-        handler = self.routes.get(path)
+        request = Request(environ)
+        response = Response()
+
+        handler = self.routes.get(request.path_info)
         if handler:
-            status = "200 OK"
-            response_headers = [("Content-Type", "text/plain")]
-            start_response(status, response_headers)
-            return [handler(environ).encode("utf-8")]
+            try:
+                handler(request, response)
+            except Exception as err:
+                response.status = HTTPStatus.INTERNAL_SERVER_ERROR
+                response.json = {'error': f'internal server error: {err}'}
         else:
-            status = "404 Not Found"
-            response_headers = [("Content-Type", "text/plain")]
-            start_response(status, response_headers)
-            return [b"Not Found"]
+            if self.not_found_handler:
+                self.not_found_handler(request, response)
+            else:
+                response = HTTPNotFound()
+
+        return response(environ, start_response)
