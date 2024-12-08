@@ -8,7 +8,7 @@ class Middleware:
     def before(self, request: Request) -> None:
         pass
 
-    def after(self, request: Request, response: Response) -> Response:
+    def after(self, _request: Request, response: Response) -> Response:
         return response
 
     def __call__(self, request: Request) -> Response:

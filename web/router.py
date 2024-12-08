@@ -1,5 +1,4 @@
 import sys
-from typing import List, Optional
 from http import HTTPMethod
 
 from webob import Request, Response
