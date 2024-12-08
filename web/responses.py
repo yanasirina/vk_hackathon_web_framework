@@ -30,9 +30,9 @@ class HTMLResponse(Response):
 
 
 class RedirectResponse(Response):
-    def __init__(self, location: str, *args, body: dict = None, status: HTTPStatus = 302, **kwargs):
+    def __init__(self, location: str, *args, body: dict = None, status: HTTPStatus = HTTPStatus.MOVED_PERMANENTLY, **kwargs):
         super().__init__(*args, **kwargs)
-        self.status = HTTPStatus.MOVED_PERMANENTLY
+        self.status = HTTPStatus.status
         self.headers['Location'] = location
 
         if body:
