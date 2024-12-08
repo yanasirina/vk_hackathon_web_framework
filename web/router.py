@@ -1,4 +1,3 @@
-import sys
 from http import HTTPMethod
 
 from webob import Request, Response
