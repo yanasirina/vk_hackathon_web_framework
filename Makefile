@@ -32,7 +32,7 @@ build:
 
 .PHONY: play
 play:
-	@python3 playground/main.py
+	@cd playground && python3 main.py
 
 .PHONY: deps
 deps:
