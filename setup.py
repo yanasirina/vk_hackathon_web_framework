@@ -10,6 +10,7 @@ def main() -> None:
             'gunicorn',
             'webob',
             'jinja2'
+            'python-dotenv'
         ],
     )
 
