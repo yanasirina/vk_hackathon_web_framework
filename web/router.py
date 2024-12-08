@@ -15,7 +15,13 @@ class Router:
         self.routes = {}
         self.not_found_handler = None
 
-    def _add_route(self, method: str, path: str, func: Callable, middlewares: list[Middleware] | None = None) -> None:
+    def _add_route(
+            self,
+            method: str,
+            path: str,
+            func: Callable,
+            middlewares: list[Middleware] | None = None
+    ) -> None:
         if middlewares is None:
             middlewares = []
 
@@ -24,35 +30,55 @@ class Router:
 
         self.routes[path][method] = self._apply_middlewares(func, middlewares)
 
-    def get(self, path: str, middlewares: list[Middleware] | None = None) -> Callable:
+    def get(
+            self,
+            path: str,
+            middlewares: list[Middleware] | None = None
+    ) -> Callable:
         def decorator(func: Callable) -> Callable:
             self._add_route(HTTPMethod.GET, path, func, middlewares)
             return func
 
         return decorator
 
-    def post(self, path: str, middlewares: list[Middleware] | None = None) -> Callable:
+    def post(
+            self,
+            path: str,
+            middlewares: list[Middleware] | None = None
+    ) -> Callable:
         def decorator(func: Callable) -> Callable:
             self._add_route(HTTPMethod.POST, path, func, middlewares)
             return func
 
         return decorator
 
-    def put(self, path: str, middlewares: list[Middleware] | None = None) -> Callable:
+    def put(
+            self,
+            path: str,
+            middlewares: list[Middleware] | None = None
+    ) -> Callable:
         def decorator(func: Callable) -> Callable:
             self._add_route(HTTPMethod.PUT, path, func, middlewares)
             return func
 
         return decorator
 
-    def patch(self, path: str, middlewares: list[Middleware] | None = None) -> Callable:
+    def patch(
+            self,
+            path: str,
+            middlewares: list[Middleware] | None = None
+    ) -> Callable:
         def decorator(func: Callable) -> Callable:
             self._add_route(HTTPMethod.PATCH, path, func, middlewares)
             return func
 
         return decorator
 
-    def delete(self, path: str, middlewares: list[Middleware] | None = None) -> Callable:
+    def delete(
+            self,
+            path: str,
+            middlewares: list[Middleware] | None = None
+    ) -> Callable:
         def decorator(func: Callable) -> Callable:
             self._add_route(HTTPMethod.DELETE, path, func, middlewares)
             return func

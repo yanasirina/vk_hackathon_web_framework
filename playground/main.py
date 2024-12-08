@@ -32,13 +32,13 @@ def html_example(_request: Request) -> Response:
 
 
 @router.get('/hello', middlewares=[ExampleMiddleware])
-def get_example(request):
+def get_example(request: Request) -> JsonResponse:
     logger.info(f'got {request=}')
     return web.responses.JsonResponse({'message': 'hello, world!'})
 
 
 @router.post('/hello', middlewares=[ExampleMiddleware])
-def post_example(request):
+def post_example(request: Request) -> JsonResponse:
     logger.info(f'got {request=}')
     return web.responses.JsonResponse({'message': 'hello, world!', 'data': request.json})
 
