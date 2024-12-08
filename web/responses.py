@@ -1,4 +1,5 @@
 from enum import Enum
+from http import HTTPStatus
 
 from webob import Response as _Response
 from jinja2 import Environment, FileSystemLoader
@@ -26,3 +27,22 @@ class HTMLResponse(Response):
         template = env.get_template(template_path)
         rendered_html = template.render(context)
         super().__init__(*args, body=rendered_html, content_type=ContentType.HTML.value, **kwargs)
+
+
+class RedirectResponse(Response):
+    def __init__(
+        self,
+        location: str,
+        *args,
+        body: dict | None = None,
+        status: HTTPStatus = HTTPStatus.MOVED_PERMANENTLY,
+        **kwargs,
+    ):
+        super().__init__(*args, **kwargs)
+        self.status = status
+        self.headers['Location'] = location
+
+        if body:
+            self.json_body = body
+        else:
+            self.body = b""
