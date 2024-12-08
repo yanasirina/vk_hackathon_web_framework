@@ -12,10 +12,10 @@ logger = logging.getLogger('app')
 
 class ExampleMiddleware(web.Middleware):
     def before(self, request):
-        print('before middleware call')
+        logger.info('before middleware call')
 
     def after(self, _request, response):
-        print('after middleware call')
+        logger.info('after middleware call')
         return response
 
 
