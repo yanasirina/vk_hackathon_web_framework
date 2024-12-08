@@ -4,26 +4,21 @@ from webob import Response
 from webob import Request
 
 import web
+from web import JsonResponse
 
 
 app = web.Router()
 
 
 @app.route('/hello')
-def json_example(request: Request) -> Response:
-    _ = request.method
-    response = Response()
-    response.content_type = 'application/json'
-    response.json = {'message': 'hello, world!'}
+def json_example(_request):
+    response = JsonResponse({'message': 'hello, world!'})
     return response
 
 
 @app.not_found
-def custom_404(request: Request) -> Response:
-    _ = request.method
-    response = Response()
-    response.content_type = 'application/json'
-    response.json = {'error': 'route not found'}
+def custom_404(_request):
+    response = JsonResponse({'error': 'route not found'})
     return response
 
 

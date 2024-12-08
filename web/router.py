@@ -1,4 +1,4 @@
-from webob import Request
+from webob import Request, Response
 from webob.exc import HTTPNotFound, HTTPInternalServerError
 from typing import Callable, Optional, Dict
 
@@ -9,7 +9,7 @@ class Router:
 
     def __init__(self) -> None:
         self.routes = {}
-        self.not_found_handler = None
+        self.not_found_handler = HTTPNotFound
 
     def route(self, path: str) -> Callable:
         def decorator(func: Callable) -> Callable:
@@ -22,9 +22,8 @@ class Router:
         self.not_found_handler = func
         return func
 
-    def __call__(self, environ: Dict[str, str], start_response: Callable) -> Callable:
+    def __call__(self, environ: Dict[str, str], start_response: Callable) -> Response:
         request = Request(environ)
-        response = None
 
         handler = self.routes.get(request.path_info)
         if handler:
@@ -33,9 +32,6 @@ class Router:
             except Exception:
                 response = HTTPInternalServerError()
         else:
-            if self.not_found_handler:
-                response = self.not_found_handler(request)
-            else:
-                response = HTTPNotFound()
+            response = self.not_found_handler(request)
 
         return response(environ, start_response)
