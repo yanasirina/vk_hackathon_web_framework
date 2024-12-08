@@ -5,32 +5,35 @@ import logging
 import web
 from web import JsonResponse
 
-app = web.Router()
-
+router = web.Router()
 logger = logging.getLogger('app')
 
 
-@app.route('/hello')
-def json_example(request):
+@router.get('/hello')
+def get_example(request):
     logger.info(f'got {request=}')
-    response = JsonResponse({'message': 'hello, world!'})
-    return response
+    return JsonResponse({'message': 'hello, world!'})
 
 
-@app.not_found
+@router.post('/hello')
+def post_example(request):
+    logger.info(f'got {request=}')
+    return JsonResponse({'message': 'hello, world!', 'data': request.json})
+
+
+@router.not_found
 def custom_404(_request):
-    response = JsonResponse({'error': 'route not found'})
-    return response
+    return JsonResponse({'error': 'route not found'})
 
 
 def main() -> None:
     config = {
         'bind': '0.0.0.0:8080',
         'workers': os.cpu_count(),
-        'loglevel': 'debug',
+        'loglevel': 'info',
     }
 
-    web.Server(app, config).run()
+    web.Server(router, config).run()
 
 
 if __name__ == '__main__':
