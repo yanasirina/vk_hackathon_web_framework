@@ -2,7 +2,7 @@ import os
 import datetime
 import logging
 
-from webob import Request
+from webob import Request, Response
 from web.responses import JsonResponse
 
 import web
@@ -14,7 +14,7 @@ logger = logging.getLogger('app')
 
 
 @router.get('/main')
-def html_example(_request):
+def html_example(_request: Request) -> Response:
     response = web.responses.HTMLResponse(
         template_path='templates/index.html',
         context={'today_date': datetime.date.today()}

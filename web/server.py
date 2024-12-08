@@ -45,7 +45,7 @@ class Server(BaseApplication):
 
         app_logger.info("Application logging configured: logs to stdout")
 
-    def run(self):
+    def run(self) -> None:
         self.configure_logging()
 
         app_logger = logging.getLogger('app')
