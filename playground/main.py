@@ -1,9 +1,9 @@
 import os
 
+import logging
+
 import web
 from web import JsonResponse
-
-import logging
 
 app = web.Router()
 
