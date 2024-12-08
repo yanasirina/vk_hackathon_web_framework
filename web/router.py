@@ -1,8 +1,10 @@
+import logging
 from http import HTTPMethod
-from typing import Type, Callable
+from typing import Callable, Type
 
 from webob import Request, Response
-from webob.exc import HTTPNotFound, HTTPInternalServerError
+from webob.exc import HTTPNotFound, HTTPInternalServerError, HTTPBadRequest
+from parse import parse
 
 from .middleware import Middleware
 
@@ -33,35 +35,35 @@ class Router:
             self.global_middlewares + middlewares,
         )
 
-    def get(self, path: str, middlewares: list[Middleware] | None = None):
+    def get(self, path: str, middlewares: list[Type[Middleware]] | None = None):
         def decorator(func):
             self._add_route(HTTPMethod.GET, path, func, middlewares)
             return func
 
         return decorator
 
-    def post(self, path: str, middlewares: list[Middleware] | None = None):
+    def post(self, path: str, middlewares: list[Type[Middleware]] | None = None):
         def decorator(func):
             self._add_route(HTTPMethod.POST, path, func, middlewares)
             return func
 
         return decorator
 
-    def put(self, path: str, middlewares: list[Middleware] | None = None):
+    def put(self, path: str, middlewares: list[Type[Middleware]] | None = None):
         def decorator(func):
             self._add_route(HTTPMethod.PUT, path, func, middlewares)
             return func
 
         return decorator
 
-    def patch(self, path: str, middlewares: list[Middleware] | None = None):
+    def patch(self, path: str, middlewares: list[Type[Middleware]] | None = None):
         def decorator(func):
             self._add_route(HTTPMethod.PATCH, path, func, middlewares)
             return func
 
         return decorator
 
-    def delete(self, path: str, middlewares: list[Middleware] | None = None):
+    def delete(self, path: str, middlewares: list[Type[Middleware]] | None = None):
         def decorator(func):
             self._add_route(HTTPMethod.DELETE, path, func, middlewares)
             return func
@@ -85,12 +87,25 @@ class Router:
         request = Request(environ)
         response = Response()
 
-        method_routes = self._routes.get(request.path_info, {})
-        handler = method_routes.get(request.method)
+        handler, kwargs = self._find_handler(request)
+
+        if kwargs and handler:
+            # получаем типы аргументов из сигнатуры функции
+            logging.info(f'{handler=}')
+            signature = handler.__annotations__
+            # приводим аргументы к нужным типам
+            try:
+                kwargs = {name: signature[name](value) for name, value in
+                          kwargs.items()}
+            except ValueError:
+                response = HTTPBadRequest(
+                    json={"error": "invalid type arguments"})
+                return response(environ, start_response)
 
         if handler is not None:
             try:
-                response = handler(request)
+
+                response = handler(request, **kwargs)
             except Exception:
                 response = HTTPInternalServerError()
         else:
@@ -107,3 +122,13 @@ class Router:
             handler = middleware(handler)
 
         return handler
+
+    def _find_handler(self, request):
+        for route in self._routes:
+            parse_result = parse(route, request.path)
+            if parse_result:
+                handler = self._routes[route].get(request.method)
+                if handler is not None:
+                    return handler, parse_result.named
+
+        return None, None

@@ -21,7 +21,7 @@ class ExampleMiddleware(web.Middleware):
         return response
 
 
-router.use_middleware(ExampleMiddleware)
+# router.use_middleware(ExampleMiddleware)
 
 
 @router.get('/main', middlewares=[ExampleMiddleware])
@@ -37,6 +37,12 @@ def html_example(_request):
 def get_example(request):
     logger.info(f'got {request=}')
     return web.responses.RedirectResponse('/main')
+
+
+@router.get('/hello/{name}/{age}')
+def get_example_with_params(request, name: str, age: int):
+    logger.info(f'got {request=}')
+    return web.responses.JsonResponse({'message': 'hello, world!', 'name': name, 'age': age})
 
 
 @router.post('/hello', middlewares=[ExampleMiddleware])
