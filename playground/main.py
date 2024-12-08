@@ -1,7 +1,8 @@
 import os
 
-import web
 from webob import Response
+
+import web
 
 
 app = web.Router()
