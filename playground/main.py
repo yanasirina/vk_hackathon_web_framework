@@ -1,10 +1,10 @@
 import datetime
 import logging
 
+from config import get_config
+
 import web
 import web.responses
-
-from config import get_config
 
 
 router = web.Router()
