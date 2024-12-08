@@ -22,7 +22,7 @@ def post_example(request):
 
 
 @router.not_found
-def custom_404(request):
+def custom_404(_request):
     return JsonResponse({'error': 'route not found'})
 
 

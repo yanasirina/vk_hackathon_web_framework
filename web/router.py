@@ -1,7 +1,7 @@
-from webob import Request, Response
-from webob.exc import HTTPNotFound, HTTPInternalServerError
 from http import HTTPMethod
 
+from webob import Request, Response
+from webob.exc import HTTPNotFound, HTTPInternalServerError
 
 class Router:
     def __init__(self):
