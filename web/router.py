@@ -1,4 +1,5 @@
 from http import HTTPMethod
+from typing import Type
 
 from webob import Request, Response
 from webob.exc import HTTPNotFound, HTTPInternalServerError
@@ -10,15 +11,22 @@ class Router:
     def __init__(self):
         self.routes = {}
         self.not_found_handler = None
+        self.global_middlewares: list[Type[Middleware]] = []
 
-    def _add_route(self, method, path, func, middlewares: list[Middleware] | None = None):
+    def use_middleware(self, middleware: Type[Middleware]):
+        self.global_middlewares.append(middleware)
+
+    def _add_route(self, method, path, func, middlewares: list[Type[Middleware]] | None = None):
         if middlewares is None:
             middlewares = []
 
         if path not in self.routes:
             self.routes[path] = {}
 
-        self.routes[path][method] = self._apply_middlewares(func, middlewares)
+        self.routes[path][method] = self._apply_middlewares(
+            func,
+            self.global_middlewares + middlewares,
+        )
 
     def get(self, path, middlewares: list[Middleware] | None = None):
         def decorator(func):
