@@ -34,7 +34,7 @@ class RedirectResponse(Response):
         self,
         location: str,
         *args,
-        body: dict = None,
+        body: dict | None = None,
         status: HTTPStatus = HTTPStatus.MOVED_PERMANENTLY,
         **kwargs,
     ):
