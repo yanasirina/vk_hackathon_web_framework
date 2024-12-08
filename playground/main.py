@@ -10,6 +10,15 @@ router = web.Router()
 logger = logging.getLogger('app')
 
 
+class ExampleMiddleware(web.Middleware):
+    def before(self, request):
+        logger.info('before middleware call')
+
+    def after(self, _request, response):
+        logger.info('after middleware call')
+        return response
+
+
 @router.get('/main')
 def html_example(_request):
     response = web.responses.HTMLResponse(
@@ -19,13 +28,13 @@ def html_example(_request):
     return response
 
 
-@router.get('/hello')
+@router.get('/hello', middlewares=[ExampleMiddleware])
 def get_example(request):
     logger.info(f'got {request=}')
     return web.responses.JsonResponse({'message': 'hello, world!'})
 
 
-@router.post('/hello')
+@router.post('/hello', middlewares=[ExampleMiddleware])
 def post_example(request):
     logger.info(f'got {request=}')
     return web.responses.JsonResponse({'message': 'hello, world!', 'data': request.json})
