@@ -1,22 +1,15 @@
-import sys
-
-from webob import Request
+from webob import Request, Response
 from webob.exc import HTTPNotFound, HTTPInternalServerError
 from http import HTTPMethod
+
 import logging
 
-logger = logging.getLogger(__name__)
-stdout_handler = logging.StreamHandler(sys.stdout)
-stdout_handler.setLevel(logging.DEBUG)
-stdout_formatter = logging.Formatter("STDOUT: %(levelname)s - %(message)s")
-stdout_handler.setFormatter(stdout_formatter)
-logger.addHandler(stdout_handler)
-
+logger = logging.getLogger('app')
 
 class Router:
     def __init__(self):
         self.routes = {}
-        self.not_found_handler = None
+        self.not_found_handler = HTTPNotFound
 
     def add_route(self, method, path, func):
         logger.info(f'add route, {method}, {path}, {func}')
@@ -61,9 +54,8 @@ class Router:
         self.not_found_handler = func
         return func
 
-    def __call__(self, environ, start_response):
+    def __call__(self, environ, start_response) -> Response:
         request = Request(environ)
-        response = None
 
         method_routes = self.routes.get(request.path_info, {})
         handler = method_routes.get(request.method)
@@ -74,9 +66,6 @@ class Router:
             except Exception:
                 response = HTTPInternalServerError()
         else:
-            if self.not_found_handler:
-                response = self.not_found_handler(request)
-            else:
-                response = HTTPNotFound()
+            response = self.not_found_handler(request)
 
         return response(environ, start_response)
