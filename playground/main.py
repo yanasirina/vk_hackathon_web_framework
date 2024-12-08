@@ -1,10 +1,18 @@
 import os
 
+import logging
+
 import web
 from web import JsonResponse
 
+router = web.Router()
+logger = logging.getLogger('app')
 
-app = web.Router()
+
+@router.get('/hello')
+def get_example(request):
+    logger.info(f'got {request=}')
+    return JsonResponse({'message': 'hello, world!'})
 
 
 class ExampleMiddleware(web.Middleware):
@@ -16,18 +24,15 @@ class ExampleMiddleware(web.Middleware):
         return response
 
 
-@app.route('/hello', middlewares=[ExampleMiddleware])
-def json_example(_request):
-    response = JsonResponse({'message': 'hello, world!'})
-    print('handler')
-    return response
+@router.post('/hello', middlewares=[ExampleMiddleware])
+def post_example(request):
+    logger.info(f'got {request=}')
+    return JsonResponse({'message': 'hello, world!', 'data': request.json})
 
 
-@app.not_found
+@router.not_found
 def custom_404(_request):
-    response = JsonResponse({'error': 'route not found'})
-    print('handler')
-    return response
+    return JsonResponse({'error': 'route not found'})
 
 
 def main() -> None:
@@ -37,7 +42,7 @@ def main() -> None:
         'loglevel': 'info',
     }
 
-    web.Server(app, config).run()
+    web.Server(router, config).run()
 
 
 if __name__ == '__main__':
