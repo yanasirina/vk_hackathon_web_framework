@@ -1,6 +1,7 @@
-import os
 import datetime
 import logging
+
+from config import get_config
 
 import web
 import web.responses
@@ -46,12 +47,7 @@ def custom_404(_request):
 
 
 def main() -> None:
-    config = {
-        'bind': '0.0.0.0:8080',
-        'workers': os.cpu_count(),
-        'loglevel': 'info',
-    }
-
+    config = get_config()
     web.Server(router, config).run()
 
 

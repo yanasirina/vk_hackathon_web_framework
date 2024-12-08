@@ -9,7 +9,8 @@ def main() -> None:
         install_requires=[
             'gunicorn',
             'webob',
-            'jinja2'
+            'jinja2',
+            'python-dotenv',
         ],
     )
 
