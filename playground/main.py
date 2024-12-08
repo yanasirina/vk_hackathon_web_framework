@@ -21,7 +21,7 @@ class ExampleMiddleware(web.Middleware):
         return response
 
 
-router.use_middleware(ExampleMiddleware)
+# router.use_middleware(ExampleMiddleware)
 
 
 @router.get('/main', middlewares=[ExampleMiddleware])

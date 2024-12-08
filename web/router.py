@@ -1,3 +1,4 @@
+import logging
 from http import HTTPMethod
 from typing import Callable, Type
 
@@ -90,6 +91,7 @@ class Router:
 
         if kwargs and handler:
             # получаем типы аргументов из сигнатуры функции
+            logging.info(f'{handler=}')
             signature = handler.__annotations__
             # приводим аргументы к нужным типам
             try:
