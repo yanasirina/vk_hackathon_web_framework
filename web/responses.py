@@ -21,8 +21,8 @@ class JsonResponse(Response):
 
 
 class HTMLResponse(Response):
-    def __init__(self, template_path: str, *args, context: dict, **kwargs):
-        env = Environment(loader=FileSystemLoader(''))
+    def __init__(self, template_path: str, context: dict, *args, templates_dir: str = '', **kwargs):
+        env = Environment(loader=FileSystemLoader(templates_dir))
         template = env.get_template(template_path)
         rendered_html = template.render(context)
         super().__init__(*args, body=rendered_html, content_type=ContentType.HTML.value, **kwargs)
