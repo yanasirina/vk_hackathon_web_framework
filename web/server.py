@@ -6,7 +6,7 @@ class Server(BaseApplication):
     app: Callable
     options: Optional[Dict[str, Any]]
 
-    def __init__(self, app: Callable, options=None) -> None:
+    def __init__(self, app: Callable, options: Optional[Dict[str, Any]] = None) -> None:
         self.app = app
         self.options = options or {}
         super().__init__()
