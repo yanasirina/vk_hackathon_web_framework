@@ -34,7 +34,7 @@ class TestJsonResponse(unittest.TestCase):
 
 class TestHTMLResponse(unittest.TestCase):
     def setUp(self):
-        self.template_file = tempfile.NamedTemporaryFile(mode="w", delete=False, suffix=".html")
+        self.template_file = tempfile.NamedTemporaryFile(delete=False, suffix=".html")
         self._write_to_file("<h1>Hello, {{ name }}!</h1>")
 
     def tearDown(self):
