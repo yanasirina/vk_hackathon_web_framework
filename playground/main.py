@@ -1,5 +1,6 @@
 import datetime
 import logging
+from time import sleep
 
 from config import get_config
 
@@ -44,6 +45,12 @@ def post_example(request):
 @router.not_found
 def custom_404(_request):
     return web.responses.JsonResponse({'error': 'route not found'})
+
+
+@router.get('/perfomance_testing')
+def testing(_request):
+    sleep(0.1)
+    return web.responses.JsonResponse({'result_code': 'success'})
 
 
 def main() -> None:
