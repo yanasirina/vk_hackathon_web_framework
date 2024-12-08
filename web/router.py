@@ -16,7 +16,7 @@ class Router:
     def _add_route(self, method, path, func, middlewares: Optional[List[Middleware]] = None):
         if middlewares is None:
             middlewares = []
-        
+
         if path not in self.routes:
             self.routes[path] = {}
 
