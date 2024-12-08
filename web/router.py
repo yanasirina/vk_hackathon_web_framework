@@ -28,7 +28,7 @@ class Router:
         if path not in self._routes:
             self._routes[path] = {}
 
-        self.routes[path][method] = self._apply_middlewares(
+        self._routes[path][method] = self._apply_middlewares(
             func,
             self.global_middlewares + middlewares,
         )
