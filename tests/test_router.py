@@ -23,6 +23,20 @@ def test_get_route(router):
     assert response.text == "Hello, World!"
 
 
+def test_get_route_with_params(router):
+    @router.get("/hello/{name}/{age}")
+    def hello(request, name: str, age: int):
+        assert isinstance(name, str)
+        assert isinstance(age, int)
+        return Response(f"Name: {name}, Age: {age}.")
+
+    environ = {"PATH_INFO": "/hello/Alice/25", "REQUEST_METHOD": "GET"}
+    response = Request(environ).get_response(router)
+
+    assert response.status_code == 200
+    assert response.text == "Name: Alice, Age: 25."
+
+
 def test_post_route(router):
     @router.post("/submit")
     def submit(request):
@@ -43,7 +57,6 @@ def test_not_found_route(router):
 
 
 def test_custom_not_found_handler(router):
-
     environ = {"PATH_INFO": "/nonexistent", "REQUEST_METHOD": "GET"}
     response = Request(environ).get_response(router)
 
