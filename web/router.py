@@ -63,9 +63,6 @@ class Router:
         request = Request(environ)
         response = Response()
 
-        # method_routes = self.routes.get(request.path_info, {})
-        # handler = method_routes.get(request.method)
-
         handler, kwargs = self._find_handler(request)
 
         if kwargs and handler:
