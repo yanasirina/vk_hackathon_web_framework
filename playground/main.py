@@ -33,6 +33,11 @@ def get_example(request):
     logger.info(f'got {request=}')
     return web.responses.JsonResponse({'message': 'hello, world!'})
 
+@router.get('/hello/{name}/{age}')
+def get_example(request, name: str, age: int):
+    logger.info(f'got {request=}')
+    return web.responses.JsonResponse({'message': 'hello, world!', 'name': name, 'age': age})
+
 
 @router.post('/hello', middlewares=[ExampleMiddleware])
 def post_example(request):

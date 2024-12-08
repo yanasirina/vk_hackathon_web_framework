@@ -1,9 +1,10 @@
 from http import HTTPMethod
-from typing import Callable
+from typing import Callable, Type
 
 from webob import Request, Response
 from webob.exc import HTTPNotFound, HTTPInternalServerError, HTTPBadRequest
 from parse import parse
+
 from .middleware import Middleware
 
 
@@ -26,42 +27,42 @@ class Router:
 
         self._routes[path][method] = self._apply_middlewares(func, middlewares)
 
-    def get(self, path: str, middlewares: list[Middleware] | None = None):
+    def get(self, path: str, middlewares: list[Type[Middleware]] | None = None):
         def decorator(func):
             self._add_route(HTTPMethod.GET, path, func, middlewares)
             return func
 
         return decorator
 
-    def post(self, path: str, middlewares: list[Middleware] | None = None):
+    def post(self, path: str, middlewares: list[Type[Middleware]] | None = None):
         def decorator(func):
             self._add_route(HTTPMethod.POST, path, func, middlewares)
             return func
 
         return decorator
 
-    def put(self, path: str, middlewares: list[Middleware] | None = None):
+    def put(self, path: str, middlewares: list[Type[Middleware]] | None = None):
         def decorator(func):
             self._add_route(HTTPMethod.PUT, path, func, middlewares)
             return func
 
         return decorator
 
-    def patch(self, path: str, middlewares: list[Middleware] | None = None):
+    def patch(self, path: str, middlewares: list[Type[Middleware]] | None = None):
         def decorator(func):
             self._add_route(HTTPMethod.PATCH, path, func, middlewares)
             return func
 
         return decorator
 
-    def delete(self, path: str, middlewares: list[Middleware] | None = None):
+    def delete(self, path: str, middlewares: list[Type[Middleware]] | None = None):
         def decorator(func):
             self._add_route(HTTPMethod.DELETE, path, func, middlewares)
             return func
 
         return decorator
 
-    def routes(self, path: str, methods: list[HTTPMethod] | None = None):
+    def routes(self, path: str, methods: list[Type[Middleware]] | None = None):
 
         def decorator(func: Callable[[Request], Response]):
             for method in (methods or []):
@@ -113,12 +114,12 @@ class Router:
 
         return handler
 
-
     def _find_handler(self, request):
-        for route, method_handlers in self.routes.items():
+        for route in self._routes:
             parse_result = parse(route, request.path)
             if parse_result:
-                handler = method_handlers.get(request.method)
-                if handler:
+                handler = self._routes[route].get(request.method)
+                if handler is not None:
                     return handler, parse_result.named
+
         return None, None
