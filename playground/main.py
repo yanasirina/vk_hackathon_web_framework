@@ -14,7 +14,7 @@ class ExampleMiddleware(web.Middleware):
     def before(self, request):
         print('before middleware call')
 
-    def after(self, request, response):
+    def after(self, _request, response):
         print('after middleware call')
         return response
 
