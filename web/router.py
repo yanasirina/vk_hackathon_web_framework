@@ -1,7 +1,7 @@
 from http import HTTPStatus
 
 from webob import Request, Response
-from webob.exc import HTTPNotFound
+from webob.exc import HTTPNotFound, HTTPInternalServerError
 
 
 class Router:
@@ -29,8 +29,7 @@ class Router:
             try:
                 handler(request, response)
             except Exception as err:
-                response.status = HTTPStatus.INTERNAL_SERVER_ERROR
-                response.json = {'error': f'internal server error: {err}'}
+                response = HTTPInternalServerError()
         else:
             if self.not_found_handler:
                 self.not_found_handler(request, response)
