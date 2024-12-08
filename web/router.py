@@ -5,7 +5,7 @@ from webob.exc import HTTPNotFound, HTTPInternalServerError
 class Router:
     def __init__(self):
         self.routes = {}
-        self.not_found_handler = None
+        self.not_found_handler = HTTPNotFound
 
     def route(self, path):
         def decorator(func):
@@ -20,7 +20,6 @@ class Router:
 
     def __call__(self, environ, start_response):
         request = Request(environ)
-        response = None
 
         handler = self.routes.get(request.path_info)
         if handler:
@@ -29,9 +28,6 @@ class Router:
             except Exception:
                 response = HTTPInternalServerError()
         else:
-            if self.not_found_handler:
-                response = self.not_found_handler(request)
-            else:
-                response = HTTPNotFound()
+            response = self.not_found_handler(request)
 
         return response(environ, start_response)
