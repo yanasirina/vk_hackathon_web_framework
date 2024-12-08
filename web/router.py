@@ -62,8 +62,9 @@ class Router:
         return decorator
 
     def routes(self, path: str, methods: list[HTTPMethod] | None = None):
+
         def decorator(func: Callable[[Request], Response]):
-            for method in methods:
+            for method in (methods or []):
                 self._add_route(method, path, func)
             return func
 
