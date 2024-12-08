@@ -28,13 +28,13 @@ def test_get_route_with_params(router):
     def hello(request, name: str, age: int):
         assert isinstance(name, str)
         assert isinstance(age, int)
-        return Response(f"Name: {name}, Age: {age}")
+        return Response(f"Name: {name}, Age: {age}.")
 
     environ = {"PATH_INFO": "/hello/Alice/25", "REQUEST_METHOD": "GET"}
     response = Request(environ).get_response(router)
 
     assert response.status_code == 200
-    assert response.text == "Name: Alice, Age: 25"
+    assert response.text == "Name: Alice, Age: 25."
 
 
 def test_post_route(router):
