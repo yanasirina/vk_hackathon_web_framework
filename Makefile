@@ -24,7 +24,7 @@ docker-test:
 
 .PHONY: docker-test-report
 docker-test-report:
-	@docker run --rm -p 8080:8080 -v $(shell pwd):/app --name web-playground-container web-playground coverage report -m
+	@docker run --rm -p 8080:8080 -v $(shell pwd):/app --name web-playground-container web-playground coverage report -m --include="*.py"
 
 .PHONY: build
 build:
@@ -32,7 +32,7 @@ build:
 
 .PHONY: play
 play:
-	@python3 playground/main.py
+	@cd playground && python3 main.py
 
 .PHONY: deps
 deps:

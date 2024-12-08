@@ -1,9 +1,10 @@
-import os
 import datetime
 import logging
 
 from webob import Request, Response
 from web.responses import JsonResponse
+from config import get_config
+
 
 import web
 import web.responses
@@ -22,8 +23,11 @@ class ExampleMiddleware(web.Middleware):
         return response
 
 
-@router.get('/main')
-def html_example(_request: Request) -> Response:
+router.use_middleware(ExampleMiddleware)
+
+
+@router.get('/main', middlewares=[ExampleMiddleware])
+def html_example(_request) -> Response:
     response = web.responses.HTMLResponse(
         template_path='templates/index.html',
         context={'today_date': datetime.date.today()}
@@ -31,8 +35,8 @@ def html_example(_request: Request) -> Response:
     return response
 
 
-@router.get('/hello', middlewares=[ExampleMiddleware])
-def get_example(request: Request) -> JsonResponse:
+@router.get('/hello')
+def get_example(request) -> JsonResponse:
     logger.info(f'got {request=}')
     return web.responses.JsonResponse({'message': 'hello, world!'})
 
@@ -49,12 +53,7 @@ def custom_404(_request: Request) -> JsonResponse:
 
 
 def main() -> None:
-    config = {
-        'bind': '0.0.0.0:8080',
-        'workers': os.cpu_count(),
-        'loglevel': 'info',
-    }
-
+    config = get_config()
     web.Server(router, config).run()
 
 

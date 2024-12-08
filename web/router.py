@@ -1,4 +1,5 @@
 from http import HTTPMethod
+from typing import Type, Callable
 
 from webob import Request, Response
 from webob.exc import HTTPNotFound, HTTPInternalServerError
@@ -12,23 +13,29 @@ class Router:
     not_found_handler: Optional[Callable]
 
     def __init__(self) -> None:
-        self.routes = {}
+        self._routes = {}
         self.not_found_handler = None
+        self.global_middlewares: list[Type[Middleware]] = []
+
+    def use_middleware(self, middleware: Type[Middleware]):
+        self.global_middlewares.append(middleware)
 
     def _add_route(
-            self,
-            method: str,
-            path: str,
-            func: Callable,
-            middlewares: list[Middleware] | None = None
+        self,
+        method: HTTPMethod,
+        path: str, func: Callable[[Request], Response],
+        middlewares: list[Middleware] | None = None
     ) -> None:
         if middlewares is None:
             middlewares = []
 
-        if path not in self.routes:
-            self.routes[path] = {}
+        if path not in self._routes:
+            self._routes[path] = {}
 
-        self.routes[path][method] = self._apply_middlewares(func, middlewares)
+        self._routes[path][method] = self._apply_middlewares(
+            func,
+            self.global_middlewares + middlewares,
+        )
 
     def get(
             self,
@@ -84,8 +91,16 @@ class Router:
             return func
 
         return decorator
+    def routes(self, path: str, methods: list[HTTPMethod] | None = None):
 
-    def not_found(self, func: Callable) -> Callable:
+        def decorator(func: Callable[[Request], Response]):
+            for method in (methods or []):
+                self._add_route(method, path, func)
+            return func
+
+        return decorator
+
+    def not_found(self, func: Callable[[Request], Response]) -> Callable:
         self.not_found_handler = func
         return func
 
@@ -94,7 +109,7 @@ class Router:
         request = Request(environ)
         response = Response()
 
-        method_routes = self.routes.get(request.path_info, {})
+        method_routes = self._routes.get(request.path_info, {})
         handler = method_routes.get(request.method)
 
         if handler is not None:
