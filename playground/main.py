@@ -1,14 +1,18 @@
 import os
 
+import logging
+
 import web
 from web import JsonResponse
 
-
 app = web.Router()
+
+logger = logging.getLogger('app')
 
 
 @app.route('/hello')
-def json_example(_request):
+def json_example(request):
+    logger.info(f'got {request=}')
     response = JsonResponse({'message': 'hello, world!'})
     return response
 
@@ -23,7 +27,7 @@ def main() -> None:
     config = {
         'bind': '0.0.0.0:8080',
         'workers': os.cpu_count(),
-        'loglevel': 'info',
+        'loglevel': 'debug',
     }
 
     web.Server(app, config).run()
