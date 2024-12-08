@@ -35,7 +35,6 @@ def html_example(_request):
 @router.get('/hello')
 def get_example(request):
     logger.info(f'got {request=}')
-    # return web.responses.JsonResponse({'message': 'hello, world!'})
     return web.responses.RedirectResponse('/main')
 
 
