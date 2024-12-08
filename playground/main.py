@@ -12,6 +12,7 @@ logger = logging.getLogger('app')
 
 @app.route('/hello')
 def json_example(_request):
+    logger.info(f'got {_request=}')
     response = JsonResponse({'message': 'hello, world!'})
     return response
 
