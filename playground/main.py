@@ -1,25 +1,31 @@
 import os
 
-from webob import Response
+import logging
+
 from webob import Request
 
 import web
 from web import JsonResponse
 
-
-app = web.Router()
-
-
-@app.route('/hello')
-def json_example(_request: Request) -> Response:
-    response = JsonResponse({'message': 'hello, world!'})
-    return response
+router = web.Router()
+logger = logging.getLogger('app')
 
 
-@app.not_found
-def custom_404(_request: Request) -> Response:
-    response = JsonResponse({'error': 'route not found'})
-    return response
+@router.get('/hello')
+def get_example(request: Request) -> JsonResponse:
+    logger.info(f'got {request=}')
+    return JsonResponse({'message': 'hello, world!'})
+
+
+@router.post('/hello')
+def post_example(request: Request) -> JsonResponse:
+    logger.info(f'got {request=}')
+    return JsonResponse({'message': 'hello, world!', 'data': request.json})
+
+
+@router.not_found
+def custom_404(_request: Request) -> JsonResponse:
+    return JsonResponse({'error': 'route not found'})
 
 
 def main() -> None:
@@ -29,7 +35,7 @@ def main() -> None:
         'loglevel': 'info',
     }
 
-    web.Server(app, config).run()
+    web.Server(router, config).run()
 
 
 if __name__ == '__main__':
