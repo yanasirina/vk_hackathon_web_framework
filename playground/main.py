@@ -2,13 +2,11 @@ import os
 
 import web
 from web import JsonResponse
+import logging
 
 router = web.Router()
 
-import logging
-
 logger = logging.getLogger('app')
-
 
 
 @router.get('/hello')
@@ -20,13 +18,12 @@ def get_example(request):
 @router.post('/hello')
 def post_example(request):
     logger.info(f'got {request=}')
-    return JsonResponse({'message': 'hello, world!', 'data': request.data})
+    return JsonResponse({'message': 'hello, world!', 'data': request.json})
 
 
 @router.not_found
 def custom_404(request):
-   return  JsonResponse({'error': 'route not found'})
-
+    return JsonResponse({'error': 'route not found'})
 
 
 def main() -> None:
