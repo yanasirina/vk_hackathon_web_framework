@@ -11,13 +11,13 @@ app = web.Router()
 
 
 @app.route('/hello')
-def json_example(_request):
+def json_example(_request: Request) -> Response:
     response = JsonResponse({'message': 'hello, world!'})
     return response
 
 
 @app.not_found
-def custom_404(_request):
+def custom_404(_request: Request) -> Response:
     response = JsonResponse({'error': 'route not found'})
     return response
 
