@@ -3,21 +3,25 @@ import os
 from webob import Response
 
 import web
+from web.router import logger
+
+router = web.Router()
 
 
-app = web.Router()
+@router.get('/hello')
+def get_example(request):
+    logger.info(f'got {request=}')
+    return Response(content_type='application/json', json={'message': 'hello, world!'})
 
 
-@app.route('/hello')
-def json_example(request):
-    _ = request.method
-    response = Response()
-    response.content_type = 'application/json'
-    response.json = {'message': 'hello, world!'}
-    return response
+
+@router.post('/hello')
+def post_example(request):
+    logger.info(f'got {request=}')
+    return Response(content_type='application/json', json={'message': 'hello, world!', 'data': request.data})
 
 
-@app.not_found
+@router.not_found
 def custom_404(request):
     _ = request.method
     response = Response()
@@ -33,7 +37,7 @@ def main() -> None:
         'loglevel': 'info',
     }
 
-    web.Server(app, config).run()
+    web.Server(router, config).run()
 
 
 if __name__ == '__main__':
