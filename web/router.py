@@ -5,6 +5,10 @@ from webob.exc import HTTPNotFound, HTTPInternalServerError, HTTPBadRequest
 from parse import parse
 
 
+import logging
+mylog = logging.getLogger('app')
+mylog.setLevel(logging.DEBUG)
+
 class Router:
     def __init__(self):
         self.routes = {}
@@ -57,35 +61,39 @@ class Router:
     def __call__(self, environ, start_response) -> Response:
         request = Request(environ)
 
-        method_routes = self.routes.get(request.path_info, {})
-        handler = method_routes.get(request.method)
+        # method_routes = self.routes.get(request.path_info, {})
+        # handler = method_routes.get(request.method)
 
-        handler, kwargs = self._find_handler(request.path)
+        handler, kwargs = self._find_handler(request)
 
         if kwargs and handler:
             # получаем типы аргументов из сигнатуры функции
             signature = handler.__annotations__
             # приводим аргументы к нужным типам
             try:
-                kwargs = {name: signature[name](value) for name, value in kwargs.items()}
+                kwargs = {name: signature[name](value) for name, value in
+                          kwargs.items()}
             except ValueError:
-                response = HTTPBadRequest(json={"error": "invalid type arguments"})
+                response = HTTPBadRequest(
+                    json={"error": "invalid type arguments"})
                 return response(environ, start_response)
 
         if handler is not None:
-                try:
-                    response = handler(request, **kwargs)
-                except Exception:
-                    response = HTTPInternalServerError()
-            else:
-                response = self.not_found_handler(request)
+            try:
 
-            return response(environ, start_response)
+                response = handler(request, **kwargs)
+            except Exception:
+                response = HTTPInternalServerError()
+        else:
+            response = self.not_found_handler(request)
 
+        return response(environ, start_response)
 
-    def _find_handler(self, path):
-        for route, handler in self.routes.items():
-            parse_result = parse(route, path)
+    def _find_handler(self, request):
+        for route in self.routes:
+            parse_result = parse(route, request.path)
+            mylog.info(f'{parse_result=}')
             if parse_result:
+                handler = self.routes[route].get(request.method)
                 return handler, parse_result.named
         return None, None
