@@ -9,7 +9,9 @@ disable=
     E0611,
     I1101, # c-extension-no-member,
     W1203,
-    R1732
+    R1732,
+    W0621,
+    W0613
 
 
 [FORMAT]
