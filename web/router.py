@@ -1,5 +1,6 @@
 from webob import Request
 from webob.exc import HTTPNotFound, HTTPInternalServerError
+from parse import parse
 
 
 class Router:
@@ -22,10 +23,21 @@ class Router:
         request = Request(environ)
         response = None
 
-        handler = self.routes.get(request.path_info)
+        handler, kwargs = self._find_handler(request.path)
+
+        if kwargs and handler:
+            # получаем типы аргументов из сигнатуры функции
+            signature = handler.__annotations__
+            # приводим аргументы к нужным типам
+            try:
+                kwargs = {name: signature[name](value) for name, value in kwargs.items()}
+            except ValueError:
+                ...
+
+
         if handler:
             try:
-                response = handler(request)
+                response = handler(request, **kwargs)
             except Exception:
                 response = HTTPInternalServerError()
         else:
@@ -35,3 +47,11 @@ class Router:
                 response = HTTPNotFound()
 
         return response(environ, start_response)
+
+
+    def _find_handler(self, path):
+        for route, handler in self.routes.items():
+            parse_result = parse(route, path)
+            if parse_result:
+                return handler, parse_result.named
+        return None, None
