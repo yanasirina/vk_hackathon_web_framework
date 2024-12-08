@@ -98,10 +98,12 @@ class Router:
 
         return handler
 
+    
     def _find_handler(self, request):
-        for route in self.routes:
+        for route, method_handlers in self.routes.items():
             parse_result = parse(route, request.path)
             if parse_result:
-                handler = self.routes[route].get(request.method)
-                return handler, parse_result.named
+                handler = method_handlers.get(request.method)
+                if handler:
+                    return handler, parse_result.named
         return None, None
