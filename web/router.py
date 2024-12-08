@@ -1,5 +1,5 @@
 from http import HTTPMethod
-from typing import Callable, Any
+from typing import Callable
 
 from webob import Request, Response
 from webob.exc import HTTPNotFound, HTTPInternalServerError
