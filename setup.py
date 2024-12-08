@@ -11,7 +11,8 @@ def main() -> None:
             'webob',
             'jinja2',
             'python-dotenv',
-            'parse'
+            'parse',
+            'locust'
         ],
     )
 

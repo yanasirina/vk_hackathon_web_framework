@@ -12,6 +12,10 @@ class Router:
     def __init__(self):
         self._routes = {}
         self.not_found_handler = None
+        self.global_middlewares: list[Type[Middleware]] = []
+
+    def use_middleware(self, middleware: Type[Middleware]):
+        self.global_middlewares.append(middleware)
 
     def _add_route(
         self,
@@ -25,7 +29,10 @@ class Router:
         if path not in self._routes:
             self._routes[path] = {}
 
-        self._routes[path][method] = self._apply_middlewares(func, middlewares)
+        self._routes[path][method] = self._apply_middlewares(
+            func,
+            self.global_middlewares + middlewares,
+        )
 
     def get(self, path: str, middlewares: list[Type[Middleware]] | None = None):
         def decorator(func):

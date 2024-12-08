@@ -1,5 +1,6 @@
 import datetime
 import logging
+from time import sleep
 
 from config import get_config
 
@@ -20,7 +21,10 @@ class ExampleMiddleware(web.Middleware):
         return response
 
 
-@router.get('/main')
+router.use_middleware(ExampleMiddleware)
+
+
+@router.get('/main', middlewares=[ExampleMiddleware])
 def html_example(_request):
     response = web.responses.HTMLResponse(
         template_path='templates/index.html',
@@ -29,7 +33,7 @@ def html_example(_request):
     return response
 
 
-@router.get('/hello', middlewares=[ExampleMiddleware])
+@router.get('/hello')
 def get_example(request):
     logger.info(f'got {request=}')
     return web.responses.JsonResponse({'message': 'hello, world!'})
@@ -50,6 +54,12 @@ def post_example(request):
 @router.not_found
 def custom_404(_request):
     return web.responses.JsonResponse({'error': 'route not found'})
+
+
+@router.get('/perfomance_testing')
+def testing(_request):
+    sleep(0.1)
+    return web.responses.JsonResponse({'result_code': 'success'})
 
 
 def main() -> None:
