@@ -62,7 +62,7 @@ class Router:
 
         return decorator
 
-    def routes(self, path: str, methods: list[Type[Middleware]] | None = None):
+    def routes(self, path: str, methods: list[HTTPMethod] | None = None):
 
         def decorator(func: Callable[[Request], Response]):
             for method in (methods or []):
