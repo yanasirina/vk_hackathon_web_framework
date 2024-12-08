@@ -70,8 +70,7 @@ class Router:
         if handler is not None:
             try:
                 response = handler(request)
-            except Exception as err:
-                print(err, file=sys.stdout)
+            except Exception:
                 response = HTTPInternalServerError()
         else:
             if self.not_found_handler:
