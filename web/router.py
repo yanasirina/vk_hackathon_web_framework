@@ -1,5 +1,5 @@
 from webob import Request
-from webob.exc import HTTPNotFound, HTTPInternalServerError
+from webob.exc import HTTPNotFound, HTTPInternalServerError, HTTPBadRequest
 from parse import parse
 
 
@@ -32,7 +32,8 @@ class Router:
             try:
                 kwargs = {name: signature[name](value) for name, value in kwargs.items()}
             except ValueError:
-                ...
+                response = HTTPBadRequest(json={"error": "invalid type arguments"})
+                return response(environ, start_response)
 
 
         if handler:
