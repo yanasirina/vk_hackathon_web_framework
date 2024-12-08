@@ -101,7 +101,6 @@ class Router:
     def _find_handler(self, request):
         for route in self.routes:
             parse_result = parse(route, request.path)
-            mylog.info(f'{parse_result=}')
             if parse_result:
                 handler = self.routes[route].get(request.method)
                 return handler, parse_result.named
