@@ -58,7 +58,8 @@ def testing(_request):
 
 def main() -> None:
     config = get_config()
-    web.Server(router, config).run()
+    server = web.Server(router, config)
+    server.run()
 
 
 if __name__ == '__main__':
