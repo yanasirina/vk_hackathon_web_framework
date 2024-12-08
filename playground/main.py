@@ -1,17 +1,16 @@
-import datetime
 import os
+import datetime
 import logging
 
 import web
 import web.responses
 
 
-app = web.Router()
-
+router = web.Router()
 logger = logging.getLogger('app')
 
 
-@app.route('/main')
+@router.get('/main')
 def html_example(_request):
     response = web.responses.HTMLResponse(
         template_path='templates/index.html',
@@ -20,27 +19,31 @@ def html_example(_request):
     return response
 
 
-@app.route('/hello')
-def json_example(request):
+@router.get('/hello')
+def get_example(request):
     logger.info(f'got {request=}')
-    response = web.responses.JsonResponse({'message': 'hello, world!'})
-    return response
+    return web.responses.JsonResponse({'message': 'hello, world!'})
 
 
-@app.not_found
+@router.post('/hello')
+def post_example(request):
+    logger.info(f'got {request=}')
+    return web.responses.JsonResponse({'message': 'hello, world!', 'data': request.json})
+
+
+@router.not_found
 def custom_404(_request):
-    response = web.responses.JsonResponse({'error': 'route not found'})
-    return response
+    return web.responses.JsonResponse({'error': 'route not found'})
 
 
 def main() -> None:
     config = {
         'bind': '0.0.0.0:8080',
         'workers': os.cpu_count(),
-        'loglevel': 'debug',
+        'loglevel': 'info',
     }
 
-    web.Server(app, config).run()
+    web.Server(router, config).run()
 
 
 if __name__ == '__main__':
