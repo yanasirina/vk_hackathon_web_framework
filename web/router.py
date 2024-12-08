@@ -1,4 +1,4 @@
-from webob import Request, Response
+from webob import Request
 from webob.exc import HTTPNotFound, HTTPInternalServerError
 
 
@@ -20,17 +20,17 @@ class Router:
 
     def __call__(self, environ, start_response):
         request = Request(environ)
-        response = Response()
+        response = None
 
         handler = self.routes.get(request.path_info)
         if handler:
             try:
-                handler(request, response)
+                response = handler(request)
             except Exception:
                 response = HTTPInternalServerError()
         else:
             if self.not_found_handler:
-                self.not_found_handler(request, response)
+                response = self.not_found_handler(request)
             else:
                 response = HTTPNotFound()
 

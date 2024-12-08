@@ -1,5 +1,7 @@
 import os
 
+from webob import Response
+
 import web
 
 
@@ -7,17 +9,21 @@ app = web.Router()
 
 
 @app.route('/hello')
-def json_example(request, response):
+def json_example(request):
     _ = request.method
+    response = Response()
     response.content_type = 'application/json'
     response.json = {'message': 'hello, world!'}
+    return response
 
 
 @app.not_found
-def custom_404(request, response):
+def custom_404(request):
     _ = request.method
+    response = Response()
     response.content_type = 'application/json'
     response.json = {'error': 'route not found'}
+    return response
 
 
 def main() -> None:
