@@ -3,53 +3,54 @@ from http import HTTPMethod
 from webob import Request, Response
 from webob.exc import HTTPNotFound, HTTPInternalServerError, HTTPBadRequest
 from parse import parse
+from .middleware import Middleware
 
-
-import logging
-mylog = logging.getLogger('app')
-mylog.setLevel(logging.DEBUG)
 
 class Router:
     def __init__(self):
         self.routes = {}
-        self.not_found_handler = HTTPNotFound
+        self.not_found_handler = None
 
-    def _add_route(self, method, path, func):
+    def _add_route(self, method, path, func, middlewares: list[Middleware] | None = None):
+        if middlewares is None:
+            middlewares = []
+
         if path not in self.routes:
             self.routes[path] = {}
-        self.routes[path][method] = func
 
-    def get(self, path):
+        self.routes[path][method] = self._apply_middlewares(func, middlewares)
+
+    def get(self, path, middlewares: list[Middleware] | None = None):
         def decorator(func):
-            self._add_route(HTTPMethod.GET, path, func)
+            self._add_route(HTTPMethod.GET, path, func, middlewares)
             return func
 
         return decorator
 
-    def post(self, path):
+    def post(self, path, middlewares: list[Middleware] | None = None):
         def decorator(func):
-            self._add_route(HTTPMethod.POST, path, func)
+            self._add_route(HTTPMethod.POST, path, func, middlewares)
             return func
 
         return decorator
 
-    def put(self, path):
+    def put(self, path, middlewares: list[Middleware] | None = None):
         def decorator(func):
-            self._add_route(HTTPMethod.PUT, path, func)
+            self._add_route(HTTPMethod.PUT, path, func, middlewares)
             return func
 
         return decorator
 
-    def patch(self, path):
+    def patch(self, path, middlewares: list[Middleware] | None = None):
         def decorator(func):
-            self._add_route(HTTPMethod.PATCH, path, func)
+            self._add_route(HTTPMethod.PATCH, path, func, middlewares)
             return func
 
         return decorator
 
-    def delete(self, path):
+    def delete(self, path, middlewares: list[Middleware] | None = None):
         def decorator(func):
-            self._add_route(HTTPMethod.DELETE, path, func)
+            self._add_route(HTTPMethod.DELETE, path, func, middlewares)
             return func
 
         return decorator
@@ -58,8 +59,9 @@ class Router:
         self.not_found_handler = func
         return func
 
-    def __call__(self, environ, start_response) -> Response:
+    def __call__(self, environ, start_response):
         request = Request(environ)
+        response = Response()
 
         # method_routes = self.routes.get(request.path_info, {})
         # handler = method_routes.get(request.method)
@@ -85,9 +87,19 @@ class Router:
             except Exception:
                 response = HTTPInternalServerError()
         else:
-            response = self.not_found_handler(request)
+            if self.not_found_handler:
+                self.not_found_handler(request)
+            else:
+                response = HTTPNotFound()
 
         return response(environ, start_response)
+
+    @staticmethod
+    def _apply_middlewares(handler, middlewares):
+        for middleware in reversed(middlewares):
+            handler = middleware(handler)
+
+        return handler
 
     def _find_handler(self, request):
         for route in self.routes:
