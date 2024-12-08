@@ -1,24 +1,28 @@
 from webob import Request
 from webob.exc import HTTPNotFound, HTTPInternalServerError
+from typing import Callable, Optional, Dict
 
 
 class Router:
-    def __init__(self):
+    routes: Dict[str, Callable]
+    not_found_handler: Optional[Callable]
+
+    def __init__(self) -> None:
         self.routes = {}
         self.not_found_handler = None
 
-    def route(self, path):
-        def decorator(func):
+    def route(self, path: str) -> Callable:
+        def decorator(func: Callable) -> Callable:
             self.routes[path] = func
             return func
 
         return decorator
 
-    def not_found(self, func):
+    def not_found(self, func: Callable) -> Callable:
         self.not_found_handler = func
         return func
 
-    def __call__(self, environ, start_response):
+    def __call__(self, environ: Dict[str, str], start_response: Callable) -> Callable:
         request = Request(environ)
         response = None
 
