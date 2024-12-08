@@ -1,11 +1,11 @@
 import os
 
-import web
-from web import JsonResponse
 import logging
 
-router = web.Router()
+import web
+from web import JsonResponse
 
+router = web.Router()
 logger = logging.getLogger('app')
 
 
